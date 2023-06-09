@@ -22,9 +22,8 @@ try:
 except ImportError:
     pyspng = None
 
-#----------------------------------------------------------------------------
-# Abstract base class for datasets.
 
+# Abstract base class for datasets.
 class Dataset(torch.utils.data.Dataset):
     def __init__(self,
         name,                   # Name of the dataset.
@@ -38,8 +37,8 @@ class Dataset(torch.utils.data.Dataset):
         delta_probability = 0.,  # Probability to corrupt further an already corrupted image.
         mask_full_rgb = False,
         corruption_pattern = "dust",
-        ratios = [1.0, 0.8, 0.6, 0.4, 0.2, 0.1],  # potential downsampling ratios,
-        normalize=True,
+        ratios = [1.0, 0.8, 0.6, 0.4, 0.2, 0.1],  # potential down-sampling ratios,
+        normalize=True
     ):
         assert corruption_pattern in ["dust", "box", "fixed_box", "keep_patch"], \
             "corruption_pattern must be either 'dust', 'box', 'keep_patch', or 'fixed_box'"
@@ -59,6 +58,11 @@ class Dataset(torch.utils.data.Dataset):
 
         # Apply max_size.
         self._raw_idx = np.arange(self._raw_shape[0], dtype=np.int64)
+
+        # select indices to corrupt
+        self.num_corrupted_samples = int(self.corruption_probability * self._raw_shape[0])
+        self.corrupt_indices = np.random.choice(a=self._raw_idx, size=num_corrupted_samples, replace=False)
+
         if (max_size is not None) and (self._raw_idx.size > max_size):
             np.random.RandomState(random_seed % (1 << 31)).shuffle(self._raw_idx)
             self._raw_idx = np.sort(self._raw_idx[:max_size])
@@ -114,9 +118,9 @@ class Dataset(torch.utils.data.Dataset):
         assert list(image.shape) == self.image_shape
         assert image.dtype == np.uint8
         if self._xflip[idx]:
-            assert image.ndim == 3 # CHW
+            assert image.ndim == 3  # CHW
             image = image[:, :, ::-1]
-        
+
         # get array that masks each pixel with probability self.corruption_probability with fixed seed for reproducibility
         np.random.seed(raw_idx)
         torch.manual_seed(raw_idx)
@@ -132,10 +136,12 @@ class Dataset(torch.utils.data.Dataset):
             else:
                 corruption_mask = np.random.binomial(1, 1 - self.corruption_probability, size=image.shape).astype(np.float32)
                 hat_corruption_mask = np.minimum(corruption_mask, np.random.binomial(1, 1 - self.delta_probability, size=image.shape).astype(np.float32))
+
         elif self.corruption_pattern == "box":
             corruption_mask = get_box_mask((1,) + image.shape, 1 - self.corruption_probability, same_for_all_batch=False, device='cpu')[0]
             hat_corruption_mask = get_box_mask((1,) + image.shape, 1 - self.corruption_probability, same_for_all_batch=False, device='cpu')[0]
             hat_corruption_mask = corruption_mask * hat_corruption_mask
+
         elif self.corruption_pattern == "fixed_box":
             patch_size = int((self.corruption_probability) * image.shape[-2])
             corruption_mask = 1 - get_patch_mask((1,) + image.shape, patch_size, same_for_all_batch=False, device='cpu')[0]
@@ -144,12 +150,14 @@ class Dataset(torch.utils.data.Dataset):
                 hat_corruption_mask = corruption_mask * hat_corruption_mask
             else:
                 hat_corruption_mask = corruption_mask
+
         elif self.corruption_pattern == "keep_patch":
             patch_size = int((1 - self.corruption_probability) * image.shape[-2])
             corruption_mask = get_patch_mask((1,) + image.shape, patch_size, same_for_all_batch=False, device='cpu')
             hat_patch_size =  int((1 - self.delta_probability) * patch_size)
             hat_corruption_mask = get_hat_patch_mask(corruption_mask, patch_size, hat_patch_size, same_for_all_batch=False, device='cpu')[0]
             corruption_mask = corruption_mask[0]
+
         else:
             raise NotImplementedError("Corruption pattern not implemented")
             
