@@ -61,7 +61,7 @@ class Dataset(torch.utils.data.Dataset):
 
         # select indices to corrupt
         self.num_corrupted_samples = int(self.corruption_probability * self._raw_shape[0])
-        self.corrupt_indices = np.random.choice(a=self._raw_idx, size=num_corrupted_samples, replace=False)
+        self.corrupted_indices = np.random.choice(a=self._raw_idx, size=num_corrupted_samples, replace=False)
 
         if (max_size is not None) and (self._raw_idx.size > max_size):
             np.random.RandomState(random_seed % (1 << 31)).shuffle(self._raw_idx)
