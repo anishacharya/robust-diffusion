@@ -11,8 +11,6 @@
 import torch
 from torch_utils import persistence
 import numpy as np
-
-#----------------------------------------------------------------------------
 # Loss function corresponding to the variance preserving (VP) formulation
 # from the paper "Score-Based Generative Modeling through Stochastic
 # Differential Equations".
