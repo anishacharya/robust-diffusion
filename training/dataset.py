@@ -224,10 +224,9 @@ class Dataset(torch.utils.data.Dataset):
     def has_onehot_labels(self):
         return self._get_raw_labels().dtype == np.int64
 
-#----------------------------------------------------------------------------
+
 # Dataset subclass that loads images recursively from the specified directory
 # or ZIP file.
-
 class ImageFolderDataset(Dataset):
     def __init__(self,
         path,                   # Path to directory or zip.
