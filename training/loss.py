@@ -151,7 +151,6 @@ class AmbientVPLoss:
             raise ValueError("Wrong norm type. Use 1 or 2.")
         return train_loss, val_loss, test_loss
 
-
     def sigma(self, t):
         t = torch.as_tensor(t)
         return ((0.5 * self.beta_d * (t ** 2) + self.beta_min * t).exp() - 1).sqrt()
