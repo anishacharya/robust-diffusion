@@ -58,11 +58,6 @@ class Dataset(torch.utils.data.Dataset):
 
         # Apply max_size.
         self._raw_idx = np.arange(self._raw_shape[0], dtype=np.int64)
-
-        # select indices to corrupt
-        self.num_corrupted_samples = int(self.corruption_probability * self._raw_shape[0])
-        self.corrupted_indices = np.random.choice(a=self._raw_idx, size=num_corrupted_samples, replace=False)
-
         if (max_size is not None) and (self._raw_idx.size > max_size):
             np.random.RandomState(random_seed % (1 << 31)).shuffle(self._raw_idx)
             self._raw_idx = np.sort(self._raw_idx[:max_size])
@@ -72,6 +67,10 @@ class Dataset(torch.utils.data.Dataset):
         if xflip:
             self._raw_idx = np.tile(self._raw_idx, 2)
             self._xflip = np.concatenate([self._xflip, np.ones_like(self._xflip)])
+
+        # select indices to corrupt
+        self.num_corrupted_samples = int(self.corruption_probability * len(self._raw_idx))
+        self.corrupted_indices = np.random.choice(a=self._raw_idx, size=num_corrupted_samples, replace=False)
 
     def _get_raw_labels(self):
         if self._raw_labels is None:
