@@ -410,7 +410,7 @@ def create_dir(directory):
 
 def list_dir(directory):
 	if not directory.startswith('s3://'):
-		return os.path.listdir(directory)
+		return os.listdir(directory)
 	else:
 		s3 = s3fs.S3FileSystem(anon=False)
 		return [x['Key'] for x in s3.listdir(directory)]
