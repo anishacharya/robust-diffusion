@@ -33,8 +33,9 @@ class Dataset(torch.utils.data.Dataset):
         xflip       = False,    # Artificially double the size of the dataset via x-flips. Applied after max_size.
         random_seed = 0,        # Random seed to use when applying max_size.
         cache       = False,    # Cache images in CPU memory?
-        corruption_probability = 0.,   # Probability to corrupt a single image.
-        corruption_fraction = 0.,       # fraction of samples corrupted
+
+        corruption_fraction = 0.,      # fraction of samples corrupted
+        corruption_probability=0.,  # Probability to corrupt a single image.
         delta_probability = 0.,  # Probability to corrupt further an already corrupted image.
         mask_full_rgb = False,
         corruption_pattern = "dust",
