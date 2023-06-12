@@ -62,15 +62,16 @@ class Dataset(torch.utils.data.Dataset):
             np.random.RandomState(random_seed % (1 << 31)).shuffle(self._raw_idx)
             self._raw_idx = np.sort(self._raw_idx[:max_size])
 
+        # select indices to corrupt
+        self.num_corrupted_samples = int(self.corruption_probability * len(self._raw_idx))
+        self.corrupted_indices = np.random.choice(a=self._raw_idx, size=num_corrupted_samples, replace=False)
+
         # Apply xflip.
         self._xflip = np.zeros(self._raw_idx.size, dtype=np.uint8)
         if xflip:
             self._raw_idx = np.tile(self._raw_idx, 2)
             self._xflip = np.concatenate([self._xflip, np.ones_like(self._xflip)])
-
-        # select indices to corrupt
-        self.num_corrupted_samples = int(self.corruption_probability * len(self._raw_idx))
-        self.corrupted_indices = np.random.choice(a=self._raw_idx, size=num_corrupted_samples, replace=False)
+            self.corrupted_indices = np.tile(self.corrupted_indices, 2)
 
     def _get_raw_labels(self):
         if self._raw_labels is None:
