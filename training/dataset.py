@@ -34,6 +34,7 @@ class Dataset(torch.utils.data.Dataset):
         random_seed = 0,        # Random seed to use when applying max_size.
         cache       = False,    # Cache images in CPU memory?
         corruption_probability = 0.,   # Probability to corrupt a single image.
+        corruption_fraction = 0.,       # fraction of samples corrupted
         delta_probability = 0.,  # Probability to corrupt further an already corrupted image.
         mask_full_rgb = False,
         corruption_pattern = "dust",
@@ -50,6 +51,7 @@ class Dataset(torch.utils.data.Dataset):
         self._raw_labels = None
         self._label_shape = None
         self.corruption_probability = corruption_probability
+        self.corruption_fraction = corruption_fraction
         self.delta_probability = delta_probability
         self.mask_full_rgb = mask_full_rgb
         self.corruption_pattern = corruption_pattern
