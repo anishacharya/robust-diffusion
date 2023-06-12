@@ -121,14 +121,14 @@ class Dataset(torch.utils.data.Dataset):
             assert image.ndim == 3  # CHW
             image = image[:, :, ::-1]
 
-        # get array that masks each pixel with probability self.corruption_probability
         # with fixed seed for reproducibility
         np.random.seed(raw_idx)
         torch.manual_seed(raw_idx)
         if self.normalize:
             image = image.astype(np.float32) / 127.5 - 1
 
-        # Apply Corruption iff it is part of the corrupted indices
+        # Apply Corruption iff it is part of the corrupted indices -
+        # get array that masks each pixel with probability self.corruption_probability
         if raw_idx in self.corrupted_indices:
             if self.corruption_pattern == "dust":
                 if self.mask_full_rgb:
