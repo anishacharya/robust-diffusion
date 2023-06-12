@@ -130,6 +130,7 @@ class Dataset(torch.utils.data.Dataset):
         # Apply Corruption iff it is part of the corrupted indices -
         # get array that masks each pixel with probability self.corruption_probability
         if raw_idx in self.corrupted_indices:
+            # Masking -- Like Daras et.al. Ambient Diffusion
             if self.corruption_pattern == "dust":
                 if self.mask_full_rgb:
                     corruption_mask = np.random.binomial(1, 1 - self.corruption_probability, size=image.shape[1:]).astype(np.float32)
@@ -162,6 +163,7 @@ class Dataset(torch.utils.data.Dataset):
                 hat_corruption_mask = get_hat_patch_mask(corruption_mask, patch_size, hat_patch_size, same_for_all_batch=False, device='cpu')[0]
                 corruption_mask = corruption_mask[0]
 
+            # other corruptions
             else:
                 raise NotImplementedError("Corruption pattern not implemented")
 
