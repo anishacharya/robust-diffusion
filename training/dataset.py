@@ -158,7 +158,7 @@ class Dataset(torch.utils.data.Dataset):
             elif self.corruption_pattern == "keep_patch":
                 patch_size = int((1 - self.corruption_probability) * image.shape[-2])
                 corruption_mask = get_patch_mask((1,) + image.shape, patch_size, same_for_all_batch=False, device='cpu')
-                hat_patch_size =  int((1 - self.delta_probability) * patch_size)
+                hat_patch_size = int((1 - self.delta_probability) * patch_size)
                 hat_corruption_mask = get_hat_patch_mask(corruption_mask, patch_size, hat_patch_size, same_for_all_batch=False, device='cpu')[0]
                 corruption_mask = corruption_mask[0]
 
