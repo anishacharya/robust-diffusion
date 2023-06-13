@@ -26,29 +26,29 @@ except ImportError:
 # Abstract base class for datasets.
 class Dataset(torch.utils.data.Dataset):
     def __init__(self,
-        name,                   # Name of the dataset.
-        raw_shape,              # Shape of the raw image data (NCHW).
-        max_size    = None,     # Artificially limit the size of the dataset. None = no limit. Applied before xflip.
-        use_labels  = False,    # Enable conditioning labels? False = label dimension is zero.
-        xflip       = False,    # Artificially double the size of the dataset via x-flips. Applied after max_size.
-        random_seed = 0,        # Random seed to use when applying max_size.
-        cache       = False,    # Cache images in CPU memory?
+                 name,  # Name of the dataset.
+                 raw_shape,  # Shape of the raw image data (NCHW).
+                 max_size=None,  # Artificially limit the size of the dataset. None = no limit. Applied before xflip.
+                 use_labels=False,  # Enable conditioning labels? False = label dimension is zero.
+                 xflip=False,  # Artificially double the size of the dataset via x-flips. Applied after max_size.
+                 random_seed=0,  # Random seed to use when applying max_size.
+                 cache: bool = False,  # Cache images in CPU memory?
 
-        corruption_fraction : float = 0.,      # fraction of samples corrupted
-        corruption_probability=0.,  # Probability to corrupt a single image.
-        delta_probability = 0.,  # Probability to corrupt further an already corrupted image.
-        mask_full_rgb = False,
-        corruption_pattern = "dust",
-        ratios = [1.0, 0.8, 0.6, 0.4, 0.2, 0.1],  # potential down-sampling ratios,
-        normalize=True
-    ):
+                 corruption_fraction: float = 0.,  # fraction of samples corrupted
+                 corruption_probability=0.,  # Probability to corrupt a single image.
+                 delta_probability=0.,  # Probability to corrupt further an already corrupted image.
+                 mask_full_rgb=False,
+                 corruption_pattern="dust",
+                 ratios=[1.0, 0.8, 0.6, 0.4, 0.2, 0.1],  # potential down-sampling ratios,
+                 normalize=True
+                 ):
         assert corruption_pattern in ["dust", "box", "fixed_box", "keep_patch"], \
             "corruption_pattern must be either 'dust', 'box', 'keep_patch', or 'fixed_box'"
         self._name = name
         self._raw_shape = list(raw_shape)
         self._use_labels = use_labels
         self._cache = cache
-        self._cached_images = dict() # {raw_idx: np.ndarray, ...}
+        self._cached_images = dict()  # {raw_idx: np.ndarray, ...}
         self._raw_labels = None
         self._label_shape = None
         self.corruption_probability = corruption_probability
@@ -136,25 +136,36 @@ class Dataset(torch.utils.data.Dataset):
             # Masking -- Like Daras et.al. Ambient Diffusion
             if self.corruption_pattern == "dust":
                 if self.mask_full_rgb:
-                    corruption_mask = np.random.binomial(1, 1 - self.corruption_probability, size=image.shape[1:]).astype(np.float32)
+                    corruption_mask = np.random.binomial(1, 1 - self.corruption_probability,
+                                                         size=image.shape[1:]).astype(np.float32)
                     corruption_mask = corruption_mask[np.newaxis, :, :].repeat(image.shape[0], axis=0)
-                    extra_mask = np.random.binomial(1, 1 - self.delta_probability, size=image.shape[1:]).astype(np.float32)
+                    extra_mask = np.random.binomial(1, 1 - self.delta_probability, size=image.shape[1:]).astype(
+                        np.float32)
                     extra_mask = extra_mask[np.newaxis, :, :].repeat(image.shape[0], axis=0)
                     hat_corruption_mask = np.minimum(corruption_mask, extra_mask)
                 else:
-                    corruption_mask = np.random.binomial(1, 1 - self.corruption_probability, size=image.shape).astype(np.float32)
-                    hat_corruption_mask = np.minimum(corruption_mask, np.random.binomial(1, 1 - self.delta_probability, size=image.shape).astype(np.float32))
+                    corruption_mask = np.random.binomial(1, 1 - self.corruption_probability, size=image.shape).astype(
+                        np.float32)
+                    hat_corruption_mask = np.minimum(corruption_mask, np.random.binomial(1, 1 - self.delta_probability,
+                                                                                         size=image.shape).astype(
+                        np.float32))
 
             elif self.corruption_pattern == "box":
-                corruption_mask = get_box_mask((1,) + image.shape, 1 - self.corruption_probability, same_for_all_batch=False, device='cpu')[0]
-                hat_corruption_mask = get_box_mask((1,) + image.shape, 1 - self.corruption_probability, same_for_all_batch=False, device='cpu')[0]
+                corruption_mask = \
+                    get_box_mask((1,) + image.shape, 1 - self.corruption_probability, same_for_all_batch=False,
+                                 device='cpu')[0]
+                hat_corruption_mask = \
+                    get_box_mask((1,) + image.shape, 1 - self.corruption_probability, same_for_all_batch=False,
+                                 device='cpu')[0]
                 hat_corruption_mask = corruption_mask * hat_corruption_mask
 
             elif self.corruption_pattern == "fixed_box":
                 patch_size = int((self.corruption_probability) * image.shape[-2])
-                corruption_mask = 1 - get_patch_mask((1,) + image.shape, patch_size, same_for_all_batch=False, device='cpu')[0]
+                corruption_mask = 1 - get_patch_mask((1,) + image.shape, patch_size, same_for_all_batch=False,
+                                                     device='cpu')[0]
                 if self.delta_probability > 0:
-                    hat_corruption_mask = 1 - get_patch_mask((1,) + image.shape, patch_size, same_for_all_batch=False, device='cpu')[0]
+                    hat_corruption_mask = 1 - get_patch_mask((1,) + image.shape, patch_size, same_for_all_batch=False,
+                                                             device='cpu')[0]
                     hat_corruption_mask = corruption_mask * hat_corruption_mask
                 else:
                     hat_corruption_mask = corruption_mask
@@ -163,7 +174,10 @@ class Dataset(torch.utils.data.Dataset):
                 patch_size = int((1 - self.corruption_probability) * image.shape[-2])
                 corruption_mask = get_patch_mask((1,) + image.shape, patch_size, same_for_all_batch=False, device='cpu')
                 hat_patch_size = int((1 - self.delta_probability) * patch_size)
-                hat_corruption_mask = get_hat_patch_mask(corruption_mask, patch_size, hat_patch_size, same_for_all_batch=False, device='cpu')[0]
+                hat_corruption_mask = \
+                    get_hat_patch_mask(corruption_mask, patch_size, hat_patch_size, same_for_all_batch=False,
+                                       device='cpu')[
+                        0]
                 corruption_mask = corruption_mask[0]
 
             # other corruptions
@@ -197,12 +211,12 @@ class Dataset(torch.utils.data.Dataset):
 
     @property
     def num_channels(self):
-        assert len(self.image_shape) == 3 # CHW
+        assert len(self.image_shape) == 3  # CHW
         return self.image_shape[0]
 
     @property
     def resolution(self):
-        assert len(self.image_shape) == 3 # CHW
+        assert len(self.image_shape) == 3  # CHW
         assert self.image_shape[1] == self.image_shape[2]
         return self.image_shape[1]
 
@@ -234,18 +248,19 @@ class Dataset(torch.utils.data.Dataset):
 # or ZIP file.
 class ImageFolderDataset(Dataset):
     def __init__(self,
-        path,                   # Path to directory or zip.
-        resolution      = None, # Ensure specific resolution, None = highest available.
-        use_pyspng      = True, # Use pyspng if available?
-        **super_kwargs,         # Additional arguments for the Dataset base class.
-    ):
+                 path,  # Path to directory or zip.
+                 resolution=None,  # Ensure specific resolution, None = highest available.
+                 use_pyspng=True,  # Use pyspng if available?
+                 **super_kwargs,  # Additional arguments for the Dataset base class.
+                 ):
         self._path = path
         self._use_pyspng = use_pyspng
         self._zipfile = None
 
         if os.path.isdir(self._path):
             self._type = 'dir'
-            self._all_fnames = {os.path.relpath(os.path.join(root, fname), start=self._path) for root, _dirs, files in os.walk(self._path) for fname in files}
+            self._all_fnames = {os.path.relpath(os.path.join(root, fname), start=self._path) for root, _dirs, files in
+                                os.walk(self._path) for fname in files}
         elif self._file_ext(self._path) == '.zip':
             self._type = 'zip'
             self._all_fnames = set(self._get_zipfile().namelist())
@@ -298,8 +313,8 @@ class ImageFolderDataset(Dataset):
             else:
                 image = np.array(PIL.Image.open(f))
         if image.ndim == 2:
-            image = image[:, :, np.newaxis] # HW => HWC
-        image = image.transpose(2, 0, 1) # HWC => CHW
+            image = image[:, :, np.newaxis]  # HW => HWC
+        image = image.transpose(2, 0, 1)  # HWC => CHW
         return image
 
     def _load_raw_labels(self):
@@ -315,4 +330,3 @@ class ImageFolderDataset(Dataset):
         labels = np.array(labels)
         labels = labels.astype({1: np.int64, 2: np.float32}[labels.ndim])
         return labels
-
