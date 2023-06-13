@@ -39,7 +39,7 @@ class Dataset(torch.utils.data.Dataset):
                  delta_probability=0.,  # Probability to corrupt further an already corrupted image.
                  mask_full_rgb=False,
                  corruption_pattern="dust",  # Noise Model
-                 ratios=(1.0, 0.8, 0.6, 0.4, 0.2, 0.1),  # potential down-sampling ratios,
+                 ratios=[1.0, 0.8, 0.6, 0.4, 0.2, 0.1],  # potential down-sampling ratios,
                  normalize=True):
 
         assert corruption_pattern in ["dust",
