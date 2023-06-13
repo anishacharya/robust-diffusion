@@ -71,8 +71,11 @@ class Dataset(torch.utils.data.Dataset):
             self._raw_idx = np.sort(self._raw_idx[:max_size])
 
         # select indices to corrupt
-        self.num_corrupted_samples = int(self.corruption_probability * len(self._raw_idx))
-        self.corrupted_indices = np.random.choice(a=self._raw_idx, size=num_corrupted_samples, replace=False)
+        self.num_corrupted_samples = int(self.corruption_fraction * len(self._raw_idx))
+
+        # random ---
+        # TODO: Should we also do class balanced ?
+        self.corrupted_indices = np.random.choice(a=self._raw_idx, size=self.num_corrupted_samples, replace=False)
 
         # Apply xflip.
         self._xflip = np.zeros(self._raw_idx.size, dtype=np.uint8)
