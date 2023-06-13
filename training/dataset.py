@@ -192,7 +192,7 @@ class Dataset(torch.utils.data.Dataset):
             else:
                 raise NotImplementedError("Corruption pattern not implemented")
 
-            return image.copy(), self.get_label(idx), corruption_mask, hat_corruption_mask
+        return image.copy(), self.get_label(idx), corruption_mask, hat_corruption_mask
 
     def get_label(self, idx):
         label = self._get_raw_labels()[self._raw_idx[idx]]
