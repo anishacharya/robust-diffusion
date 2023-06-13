@@ -59,7 +59,8 @@ class Dataset(torch.utils.data.Dataset):
         self.ratios = ratios
         self.normalize = normalize
 
-        # Apply max_size.
+        # Apply max_size -- limit the dataset size .
+        # TODO: place to implement coreset selection algorithm
         self._raw_idx = np.arange(self._raw_shape[0], dtype=np.int64)
         if (max_size is not None) and (self._raw_idx.size > max_size):
             np.random.RandomState(random_seed % (1 << 31)).shuffle(self._raw_idx)
