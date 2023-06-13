@@ -40,10 +40,14 @@ class Dataset(torch.utils.data.Dataset):
                  mask_full_rgb=False,
                  corruption_pattern="dust",              # Noise Model
                  ratios=[1.0, 0.8, 0.6, 0.4, 0.2, 0.1],  # potential down-sampling ratios,
-                 normalize=True
-                 ):
-        assert corruption_pattern in ["dust", "box", "fixed_box", "keep_patch"], \
-            "corruption_pattern must be either 'dust', 'box', 'keep_patch', or 'fixed_box'"
+                 normalize=True):
+
+        assert corruption_pattern in ["dust",
+                                      "box",
+                                      "fixed_box",
+                                      "keep_patch"], \
+            "Unsupported corruption pattern "
+
         self._name = name
         self._raw_shape = list(raw_shape)
         self._use_labels = use_labels
