@@ -1,5 +1,5 @@
-conda env create -f environment.yml -n robust_diffusion
-conda activate robust_diffusion
+#conda env create -f environment.yml -n robust_diffusion
+#conda activate robust_diffusion
 
 # Get and Preprocess raw data
 ## CIFAR-10
