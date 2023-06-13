@@ -50,7 +50,7 @@ def parse_int_list(s):
               type=click.Choice(['ddpmpp', 'ncsnpp', 'adm']), default='ddpmpp', show_default=True)
 @click.option('--precond', help='Preconditioning & loss function', metavar='vp|ve|edm|ambient',
               type=click.Choice(['vp', 've', 'edm', 'ambient']), default='ambient', show_default=True)
-# Hyperparameters.
+# Hyper-parameters.
 @click.option('--duration', help='Training duration', metavar='MIMG', type=click.FloatRange(min=0), default=200,
               show_default=True)
 @click.option('--batch', help='Total batch size', metavar='INT', type=click.IntRange(min=1), default=512,
@@ -79,9 +79,7 @@ def parse_int_list(s):
               default=1.0, show_default=True)
 @click.option('--S_noise', help='S_noise', metavar='S_noise', type=click.FloatRange(min=0, max=float('inf')),
               default=1.007, show_default=True)
-#
 # --- Robust diffusion ----
-#
 @click.option('--corruption_fraction', help='Fraction of corrupted examples',
               metavar='FLOAT', default=0.4, show_default=True)
 @click.option('--corruption_probability', help='Probability of corrupting a single pixel from the dataset',
@@ -96,9 +94,7 @@ def parse_int_list(s):
               show_default=True, required=False)
 @click.option('--max_size', help='Limit training samples.', type=int, default=None, show_default=True)
 @click.option('--xflip', help='Enable dataset x-flips', metavar='BOOL', type=bool, default=False, show_default=True)
-#
 # Performance-related.
-#
 @click.option('--fp16', help='Enable mixed-precision training', metavar='BOOL', type=bool, default=False,
               show_default=True)
 @click.option('--ls', help='Loss scaling', metavar='FLOAT', type=click.FloatRange(min=0), default=1, show_default=True)
