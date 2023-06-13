@@ -8,5 +8,4 @@
 # rm -rf cifar-10-python.tar.gz
 
 # train a diffusion model
-python3 train.py --outdir=./results/ --data=./datasets/cifar10-32x32.zip \
---batch 1 --tick 1 --max_size=10 --duration=0.01
+python3 train.py --outdir=./results/ --data=./datasets/cifar10-32x32.zip --batch 1 --tick 1 --max_size=10 --duration=0.01
