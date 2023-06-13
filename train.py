@@ -42,8 +42,10 @@ def parse_int_list(s):
 # ----------------------------------------------------------------------------
 @click.command()
 # Main options.
-@click.option('--outdir', help='Where to save the results', metavar='DIR', type=str, required=True)
-@click.option('--data', help='Path to the dataset', metavar='ZIP|DIR', type=str, required=True)
+@click.option('--outdir', help='Where to save the results', metavar='DIR', type=str, required=True,
+              default='./results/')
+@click.option('--data', help='Path to the dataset', metavar='ZIP|DIR', type=str, required=True,
+              default='./datasets/cifar10-32x32.zip')
 @click.option('--cond', help='Train class-conditional model', metavar='BOOL', type=bool, default=False,
               show_default=True)
 @click.option('--arch', help='Network architecture', metavar='ddpmpp|ncsnpp|adm',
