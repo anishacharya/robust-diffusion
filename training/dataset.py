@@ -26,20 +26,20 @@ except ImportError:
 # Abstract base class for datasets.
 class Dataset(torch.utils.data.Dataset):
     def __init__(self,
-                 name,                                   # Name of the dataset.
-                 raw_shape,                              # Shape of the raw image data (NCHW).
-                 max_size=None,                          # Artificially limit the size of the dataset. None = no limit.
-                 use_labels=False,                       # Enable conditioning labels? False = label dimension is zero.
-                 xflip=False,                            # Artificially double the size of the dataset via x-flips.
-                 random_seed=0,                          # Random seed to use when applying max_size.
-                 cache: bool = False,                    # Cache images in CPU memory?
+                 name,  # Name of the dataset.
+                 raw_shape,  # Shape of the raw image data (NCHW).
+                 max_size=None,  # Artificially limit the size of the dataset. None = no limit.
+                 use_labels=False,  # Enable conditioning labels? False = label dimension is zero.
+                 xflip=False,  # Artificially double the size of the dataset via x-flips.
+                 random_seed=0,  # Random seed to use when applying max_size.
+                 cache: bool = False,  # Cache images in CPU memory?
 
-                 corruption_fraction: float = 0.,        # fraction of samples corrupted
-                 corruption_probability=0.,              # Probability to corrupt a single image.
-                 delta_probability=0.,                   # Probability to corrupt further an already corrupted image.
+                 corruption_fraction: float = 0.,  # fraction of samples corrupted
+                 corruption_probability=0.,  # Probability to corrupt a single image.
+                 delta_probability=0.,  # Probability to corrupt further an already corrupted image.
                  mask_full_rgb=False,
-                 corruption_pattern="dust",              # Noise Model
-                 ratios=[1.0, 0.8, 0.6, 0.4, 0.2, 0.1],  # potential down-sampling ratios,
+                 corruption_pattern="dust",  # Noise Model
+                 ratios=(1.0, 0.8, 0.6, 0.4, 0.2, 0.1),  # potential down-sampling ratios,
                  normalize=True):
 
         assert corruption_pattern in ["dust",
