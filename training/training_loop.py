@@ -142,6 +142,7 @@ def training_loop(
 				if len(dataset_iter) == 2:
 					images, labels = dataset_iter
 					corruption_matrix = None
+					hat_corruption_matrix = None
 				elif len(dataset_iter) == 4:
 					images, labels, corruption_matrix, hat_corruption_matrix = dataset_iter
 					corruption_matrix = corruption_matrix.to(device)
