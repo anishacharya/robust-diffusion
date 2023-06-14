@@ -83,7 +83,7 @@ def parse_int_list(s):
               default=1.007, show_default=True)
 # --- Robust diffusion ----
 @click.option('--corruption_fraction', help='Fraction of corrupted examples',
-              metavar='FLOAT', default=0.4, show_default=True)
+              metavar='FLOAT', default=0., show_default=True)
 @click.option('--corruption_probability', help='Probability of corrupting a single pixel from the dataset',
               metavar='FLOAT', default=0.4, show_default=True)
 @click.option('--delta_probability', help='Probability of corrupting a pixel that survived', metavar='FLOAT',
