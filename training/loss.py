@@ -15,6 +15,7 @@ import numpy as np
 # from the paper "Score-Based Generative Modeling through Stochastic
 # Differential Equations".
 
+
 @persistence.persistent_class
 class VPLoss:
     def __init__(self, beta_d=19.9, beta_min=0.1, epsilon_t=1e-5):
@@ -36,11 +37,10 @@ class VPLoss:
         t = torch.as_tensor(t)
         return ((0.5 * self.beta_d * (t ** 2) + self.beta_min * t).exp() - 1).sqrt()
 
-#----------------------------------------------------------------------------
+
 # Loss function corresponding to the variance exploding (VE) formulation
 # from the paper "Score-Based Generative Modeling through Stochastic
 # Differential Equations".
-
 @persistence.persistent_class
 class VELoss:
     def __init__(self, sigma_min=0.02, sigma_max=100):
@@ -57,10 +57,9 @@ class VELoss:
         loss = weight * ((D_yn - y) ** 2)
         return loss
 
-#----------------------------------------------------------------------------
+
 # Improved loss function proposed in the paper "Elucidating the Design Space
 # of Diffusion-Based Generative Models" (EDM).
-
 @persistence.persistent_class
 class EDMLoss:
     def __init__(self, P_mean=-1.2, P_std=1.2, sigma_data=0.5):
@@ -79,9 +78,7 @@ class EDMLoss:
         return loss
 
 
-#----------------------------------------------------------------------------
 # EDMLoss for Ambient Diffusion
-
 @persistence.persistent_class
 class AmbientLoss:
     def __init__(self, P_mean=-1.2, P_std=1.2, sigma_data=0.5, norm=2):
@@ -116,7 +113,8 @@ class AmbientLoss:
             # raise exception
             raise ValueError("Wrong norm type. Use 1 or 2.")
         return train_loss, val_loss, test_loss
-#----------------------------------------------------------------------------
+
+
 # VPLoss for Ambient Diffusion
 @persistence.persistent_class
 class AmbientVPLoss:

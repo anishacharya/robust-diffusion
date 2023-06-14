@@ -55,11 +55,13 @@ class Dataset(torch.utils.data.Dataset):
         self._cached_images = dict()  # {raw_idx: np.ndarray, ...}
         self._raw_labels = None
         self._label_shape = None
-        self.corruption_probability = corruption_probability
+
         self.corruption_fraction = corruption_fraction
+        self.corruption_probability = corruption_probability
         self.delta_probability = delta_probability
         self.mask_full_rgb = mask_full_rgb
         self.corruption_pattern = corruption_pattern
+
         self.ratios = ratios
         self.normalize = normalize
 
@@ -193,7 +195,9 @@ class Dataset(torch.utils.data.Dataset):
             else:
                 raise NotImplementedError("Corruption pattern not implemented")
 
-        return image.copy(), self.get_label(idx), corruption_mask, hat_corruption_mask
+            return image.copy(), self.get_label(idx), corruption_mask, hat_corruption_mask
+
+        return image.copy(), self.get_label(idx)
 
     def get_label(self, idx):
         label = self._get_raw_labels()[self._raw_idx[idx]]
