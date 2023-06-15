@@ -142,7 +142,7 @@ class Dataset(torch.utils.data.Dataset):
 
         # Apply Corruption iff it is part of the corrupted indices -
         # get array that masks each pixel with probability self.corruption_probability
-        corruption_mask, hat_corruption_mask = None, None
+        corruption_mask, hat_corruption_mask = 1, 1
         if raw_idx in self.corrupted_indices:
             # Masking -- Like Daras et.al. Ambient Diffusion
             if self.corruption_pattern == "dust":
